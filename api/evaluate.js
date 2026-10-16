@@ -26,8 +26,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Faltan datos de la imagen o el prompt.' });
   }
 
+  // CORRECCIÓN VITAL: Eliminar la cabecera de datos de la imagen web para que la IA la vea correctamente
+  const cleanImageBase64 = imageBase64.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+
   try {
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
     
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -36,7 +39,7 @@ export default async function handler(req, res) {
         contents: [{
           parts: [
             { text: prompt },
-            { inlineData: { mimeType: "image/jpeg", data: imageBase64 } }
+            { inlineData: { mimeType: "image/jpeg", data: cleanImageBase64 } }
           ]
         }],
         // OPTIMIZACIÓN 3: Limitar tokens y ajustar la temperatura para respuestas ultrarrápidas
