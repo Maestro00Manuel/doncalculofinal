@@ -1073,7 +1073,8 @@
             if (!isStart) e.preventDefault(); 
             const pos = getCoordinates(document.getElementById('drawCanvas'), e);
             ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
-            ctx.lineWidth = isErasing ? 32 : 4; 
+            // Aumentamos el grosor del lápiz de 4 a 8 para que la IA lo vea mejor
+            ctx.lineWidth = isErasing ? 32 : 8; 
             ctx.strokeStyle = '#0F172A';
             ctx.lineTo(pos.x, pos.y); 
             ctx.stroke();
@@ -1124,17 +1125,17 @@
             tCtx.fillRect(0, 0, tmpCanvas.width, tmpCanvas.height); 
             tCtx.drawImage(canvas, 0, 0, tmpCanvas.width, tmpCanvas.height);
             
-            // Exportar en JPEG al 60% reduce el peso de 2MB a ~25KB (98% más ligero)
-            const base64Img = tmpCanvas.toDataURL('image/jpeg', 0.6).split(',')[1];
+            // Aumentamos ligeramente la calidad al 80% para asegurar legibilidad
+            const base64Img = tmpCanvas.toDataURL('image/jpeg', 0.8).split(',')[1];
 
             const sysPrompt = `Eres Don Cálculo, un maestro de matemáticas amigable y entusiasta en un colegio. 
             El alumno se llama ${state.name} y cursa ${state.grade}º de primaria.
             REGLAS:
             - Lenguaje sencillo, cariñoso y motivador. Máximo 2 frases breves.
-            - Evalúa si colocó bien los números en la pizarra y si el resultado es correcto.
+            - MUY IMPORTANTE: Se adjunta una IMAGEN con lo que el alumno ha dibujado. Debes mirar obligatoriamente los trazos de la imagen para evaluar si colocó bien los números en vertical y si el resultado es correcto.
             - Responde en formato JSON exacto: {"status": "CORRECTO" o "INCORRECTO", "feedback": "Mensaje para el alumno"}`;
 
-            const userPrompt = `Operación a resolver: ${state.currentProblem.n1} ${state.currentProblem.sym} ${state.currentProblem.n2} = ${state.currentProblem.ans}. Analiza la imagen.`;
+            const userPrompt = `Operación a resolver: ${state.currentProblem.n1} ${state.currentProblem.sym} ${state.currentProblem.n2} = ${state.currentProblem.ans}. Por favor, analiza la imagen adjunta que contiene la pizarra del alumno.`;
 
             try {
                 const res = await fetch('/api/evaluate', {
