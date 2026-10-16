@@ -1,0 +1,9 @@
+{
+"name": "don-calculo",
+"version": "1.0.0",
+"description": "Juego de matemáticas Don Cálculo",
+"type": "module",
+"scripts": {
+"start": "node api/gemini.js"
+}
+}
