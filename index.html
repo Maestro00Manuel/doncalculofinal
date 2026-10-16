@@ -356,6 +356,7 @@
             border: 1px solid var(--border);
             flex-shrink: 0;
         }
+        
         .status-bar-info { display: flex; align-items: center; gap: 8px; }
         .badge {
             background: var(--primary);
@@ -537,6 +538,7 @@
             opacity: 0; 
             transition: opacity 0.3s ease;
         }
+        
         .modal-overlay.active { display: flex; opacity: 1; }
         .modal-content {
             background: var(--surface); 
@@ -1073,7 +1075,6 @@
             if (!isStart) e.preventDefault(); 
             const pos = getCoordinates(document.getElementById('drawCanvas'), e);
             ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
-            // Aumentamos el grosor del lápiz de 4 a 8 para que la IA lo vea mejor
             ctx.lineWidth = isErasing ? 32 : 8; 
             ctx.strokeStyle = '#0F172A';
             ctx.lineTo(pos.x, pos.y); 
@@ -1112,7 +1113,6 @@
 
             const canvas = document.getElementById('drawCanvas'); 
             
-            // OPTIMIZACIÓN 1 Y 2: Redimensionamiento dinámico y compresión JPEG ultra ligera
             const maxDimension = 512;
             const scale = Math.min(1, maxDimension / Math.max(canvas.width, canvas.height));
             
@@ -1125,7 +1125,6 @@
             tCtx.fillRect(0, 0, tmpCanvas.width, tmpCanvas.height); 
             tCtx.drawImage(canvas, 0, 0, tmpCanvas.width, tmpCanvas.height);
             
-            // Aumentamos ligeramente la calidad al 80% para asegurar legibilidad
             const base64Img = tmpCanvas.toDataURL('image/jpeg', 0.8).split(',')[1];
 
             const sysPrompt = `Eres Don Cálculo, un maestro de matemáticas amigable y entusiasta en un colegio. 
@@ -1138,6 +1137,7 @@
             const userPrompt = `Operación a resolver: ${state.currentProblem.n1} ${state.currentProblem.sym} ${state.currentProblem.n2} = ${state.currentProblem.ans}. Por favor, analiza la imagen adjunta que contiene la pizarra del alumno.`;
 
             try {
+                // Aquí es donde nuestro frontend se comunica con nuestro propio Backend en Vercel
                 const res = await fetch('/api/evaluate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
