@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // CORS: Permitir peticiones solo desde nuestro propio dominio
+  // Configuración de CORS para evitar bloqueos
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'OPTIONS,POST');
@@ -15,21 +15,21 @@ export default async function handler(req, res) {
   }
 
   const { imageBase64, prompt } = req.body;
-  
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    return res.status(500).json({ error: 'Falta la API Key en las variables de entorno de Vercel.' });
+    return res.status(500).json({ error: 'Falta la API Key en las variables de entorno.' });
   }
 
   if (!imageBase64 || !prompt) {
     return res.status(400).json({ error: 'Faltan datos de la imagen o el prompt.' });
   }
 
-  // CORRECCIÓN VITAL: Eliminar la cabecera de datos de la imagen web para que la IA la vea correctamente
+  // LIMPIEZA CLAVE: Eliminamos el envoltorio para que la IA lea la imagen pura
   const cleanImageBase64 = imageBase64.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
 
   try {
+    // LLAMANDO A LA NUEVA VERSIÓN: gemini-3.8-flash
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
     
     const response = await fetch(apiUrl, {
@@ -42,11 +42,9 @@ export default async function handler(req, res) {
             { inlineData: { mimeType: "image/jpeg", data: cleanImageBase64 } }
           ]
         }],
-        // OPTIMIZACIÓN 3: Limitar tokens y ajustar la temperatura para respuestas ultrarrápidas
         generationConfig: { 
           responseMimeType: "application/json",
-          maxOutputTokens: 150,
-          temperature: 0.2
+          temperature: 0.1 // Temperatura bajísima para que no sea creativo, solo lea
         }
       })
     });
@@ -54,15 +52,30 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Error de Gemini:", data);
+      console.error("Error devuelto por Gemini:", data);
+      
+      // SALVAVIDAS: Si el servidor de Google está muy ocupado (Error 503)
+      if (response.status === 503) {
+        return res.status(200).json({ 
+          status: "INCORRECTO", 
+          feedback: "¡Uf! Hay muchos alumnos preguntando dudas a la vez. Dame unos segunditos y vuelve a pulsar Comprobar, por favor." 
+        });
+      }
+      
       return res.status(response.status).json({ error: data.error?.message || 'Error en la API de IA' });
     }
 
-    const resultText = data.candidates[0].content.parts[0].text;
+    // Extraemos el texto de la respuesta
+    let resultText = data.candidates[0].content.parts[0].text;
+    
+    // LIMPIEZA ANTIMARKDOWN: Borramos los envoltorios ```json y ``` que a veces pone Gemini
+    resultText = resultText.replace(/```json/gi, '').replace(/```/g, '').trim();
+    
+    // Devolvemos el JSON súper limpio al frontend
     return res.status(200).json(JSON.parse(resultText));
 
   } catch (error) {
     console.error("Error crítico en el servidor:", error);
-    return res.status(500).json({ error: 'Error interno en el servidor de Vercel.' });
+    return res.status(500).json({ error: 'Error interno en el servidor.' });
   }
 }
