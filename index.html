@@ -435,7 +435,8 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            flex: 1 0 auto; 
+            flex: 1; 
+            min-height: 0;
             /* Esto permite que crezca empujando el scroll hacia abajo */
         }
 
@@ -461,6 +462,7 @@
             box-shadow: var(--shadow-md);
             position: relative;
             overflow: hidden; /* Solo recorta lo que sale de sus propios bordes */
+            flex: 1;
         }
 
         .canvas-toolbar {
@@ -485,11 +487,12 @@
         .canvas-wrapper {
             position: relative;
             width: 100%;
-            min-height: 250px; /* Altura base razonable */
             display: flex;
             flex-direction: column;
             touch-action: none;
             transition: min-height 0.3s ease; /* Transición suave al ampliar */
+            flex: 1;
+            min-height: 0;
         }
 
         #drawCanvas { 
@@ -903,7 +906,7 @@
             
             // Restablecer el tamaño de la pizarra
             const wrapper = document.getElementById('canvasWrapper');
-            if (wrapper) wrapper.style.minHeight = '250px'; 
+            if (wrapper) wrapper.style.minHeight = ''; 
             
             clearCanvas(); 
             selectTool('pencil');
@@ -1000,18 +1003,23 @@
 
         function expandCanvas() {
             const wrapper = document.getElementById('canvasWrapper');
-            const currentHeight = wrapper.offsetHeight;
             
-            // Aumentar la altura en un 50% de la actual
+            // Leemos la altura exacta en píxeles que tiene en la pantalla en este momento
+            const currentHeight = wrapper.getBoundingClientRect().height;
+            
+            // Calculamos exactamente un 50% extra (+1.5)
             const newHeight = Math.floor(currentHeight * 1.5);
+            
+            // Forzamos el tamaño doblemente para anular las restricciones de flexbox
+            wrapper.style.height = `${newHeight}px`;
             wrapper.style.minHeight = `${newHeight}px`;
             
-            // Forzar resize para que la tinta no se borre al estirar y hacer scroll
+            // Damos un milisegundo al navegador para que pinte el nuevo tamaño antes de redimensionar y bajar
             setTimeout(() => {
                 resizeCanvas();
                 const screen = document.getElementById('screenGame');
                 screen.scrollTo({
-                    top: screen.scrollHeight, // Baja hasta el fondo
+                    top: screen.scrollHeight, // Baja hacia la parte inferior automáticamente
                     behavior: 'smooth'
                 });
             }, 100);
@@ -1063,10 +1071,9 @@
             canvas.width = newWidth; 
             canvas.height = newHeight;
             
-            // Garantizar fondo blanco siempre
+            // Garantizar fondo transparente para ver la cuadrícula CSS
             if(ctx) {
-                ctx.fillStyle = '#FFFFFF';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.lineCap = 'round'; 
                 ctx.lineJoin = 'round'; 
             }
@@ -1119,8 +1126,7 @@
         function clearCanvas() {
             if (!ctx) return;
             const canvas = document.getElementById('drawCanvas');
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             hasInk = false;
         }
 
