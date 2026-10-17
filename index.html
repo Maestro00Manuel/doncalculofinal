@@ -715,8 +715,9 @@
             <div class="game-main-area">
                 <div class="board-container">
                     <div class="canvas-toolbar">
-                        <button class="btn" style="background:#E2E8F0; color:#1E293B; border: 2px solid #94A3B8;" id="btnTool" onclick="toggleTool()">✏️ LÁPIZ</button>
-                        <button class="btn btn-danger" id="btnClear" onclick="clearCanvas()">🗑️ Borrar</button>
+                        <button class="btn" style="background:#CBD5E1; color:#1E293B; border: 2px solid #64748B;" id="btnPencil" onclick="selectTool('pencil')">✏️ LÁPIZ</button>
+                        <button class="btn" style="background:#F1F5F9; color:#1E293B; border: 2px solid #E2E8F0;" id="btnEraser" onclick="selectTool('eraser')">🧽 GOMA</button>
+                        <button class="btn btn-danger" id="btnClear" onclick="clearCanvas()">🗑️ Limpiar</button>
                         
                         <button class="btn btn-success" id="btnCheck" style="flex: 2;" onclick="verifyAnswer()">✓ Comprobar</button>
                         <button class="btn btn-warning" id="btnTryAgain" style="display:none; flex: 2; background:var(--warning); color:white;" onclick="tryAgain()">🔄 Corregir en pizarra</button>
@@ -908,18 +909,19 @@
             document.getElementById('displayProblem').innerText = `${state.currentProblem.n1} ${state.currentProblem.sym} ${state.currentProblem.n2} = ?`;
             
             clearCanvas(); 
-            isErasing = false; 
-            updateToolUI();
+            selectTool('pencil');
             
             const tutorPanel = document.getElementById('tutorPanelTop');
             tutorPanel.className = 'tutor-panel-top';
 
-            document.getElementById('btnTool').style.display = 'inline-flex';
+            document.getElementById('btnPencil').style.display = 'inline-flex';
+            document.getElementById('btnEraser').style.display = 'inline-flex';
             document.getElementById('btnClear').style.display = 'inline-flex';
             document.getElementById('btnCheck').style.display = 'inline-flex';
             document.getElementById('btnCheck').disabled = false;
             document.getElementById('btnClear').disabled = false;
-            document.getElementById('btnTool').disabled = false;
+            document.getElementById('btnPencil').disabled = false;
+            document.getElementById('btnEraser').disabled = false;
             document.getElementById('btnNext').style.display = 'none';
             document.getElementById('btnTryAgain').style.display = 'none';
             
@@ -990,22 +992,26 @@
             handle.addEventListener('touchstart', startResize, {passive: false});
         }
 
-        function toggleTool() { 
-            isErasing = !isErasing; 
+        function selectTool(tool) { 
+            isErasing = (tool === 'eraser'); 
             updateToolUI(); 
         }
         
         function updateToolUI() {
-            const btn = document.getElementById('btnTool');
+            const btnPencil = document.getElementById('btnPencil');
+            const btnEraser = document.getElementById('btnEraser');
+
             if(isErasing) {
-                btn.innerHTML = '🧽 GOMA'; 
-                btn.style.background = '#CBD5E1'; 
-                btn.style.borderColor = '#64748B'; 
+                btnEraser.style.background = '#CBD5E1'; 
+                btnEraser.style.borderColor = '#64748B'; 
+                btnPencil.style.background = '#F1F5F9'; 
+                btnPencil.style.borderColor = '#E2E8F0'; 
                 document.getElementById('drawCanvas').style.cursor = 'cell';
             } else {
-                btn.innerHTML = '✏️ LÁPIZ'; 
-                btn.style.background = '#E2E8F0'; 
-                btn.style.borderColor = '#94A3B8'; 
+                btnPencil.style.background = '#CBD5E1'; 
+                btnPencil.style.borderColor = '#64748B'; 
+                btnEraser.style.background = '#F1F5F9'; 
+                btnEraser.style.borderColor = '#E2E8F0'; 
                 document.getElementById('drawCanvas').style.cursor = 'crosshair';
             }
         }
@@ -1107,7 +1113,8 @@
 
             document.getElementById('btnCheck').disabled = true; 
             document.getElementById('btnClear').disabled = true; 
-            document.getElementById('btnTool').disabled = true;
+            document.getElementById('btnPencil').disabled = true;
+            document.getElementById('btnEraser').disabled = true;
             setTutorMessage("", true);
 
             const canvas = document.getElementById('drawCanvas'); 
@@ -1175,7 +1182,8 @@
                 
                 document.getElementById('btnCheck').style.display = 'none'; 
                 document.getElementById('btnClear').style.display = 'none'; 
-                document.getElementById('btnTool').style.display = 'none';
+                document.getElementById('btnPencil').style.display = 'none';
+                document.getElementById('btnEraser').style.display = 'none';
                 document.getElementById('btnNext').style.display = 'inline-flex'; 
                 document.getElementById('btnTryAgain').style.display = 'none';
                 
@@ -1186,7 +1194,8 @@
                 
                 document.getElementById('btnCheck').style.display = 'none'; 
                 document.getElementById('btnClear').style.display = 'none'; 
-                document.getElementById('btnTool').style.display = 'none';
+                document.getElementById('btnPencil').style.display = 'none';
+                document.getElementById('btnEraser').style.display = 'none';
                 document.getElementById('btnNext').style.display = 'none'; 
                 document.getElementById('btnTryAgain').style.display = 'inline-flex';
             }
@@ -1199,15 +1208,16 @@
             
             document.getElementById('btnCheck').style.display = 'inline-flex'; 
             document.getElementById('btnClear').style.display = 'inline-flex'; 
-            document.getElementById('btnTool').style.display = 'inline-flex';
+            document.getElementById('btnPencil').style.display = 'inline-flex';
+            document.getElementById('btnEraser').style.display = 'inline-flex';
             document.getElementById('btnTryAgain').style.display = 'none'; 
             document.getElementById('btnNext').style.display = 'none';
             document.getElementById('btnCheck').disabled = false; 
             document.getElementById('btnClear').disabled = false; 
-            document.getElementById('btnTool').disabled = false;
+            document.getElementById('btnPencil').disabled = false;
+            document.getElementById('btnEraser').disabled = false;
             
-            isErasing = false; 
-            updateToolUI();
+            selectTool('pencil');
         }
     </script>
 </body>
