@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --primary: #6366F1;       
@@ -50,7 +51,7 @@
             align-items: center;
             height: 100vh;
             padding: 1vmin;
-            overflow: hidden;
+            overflow: hidden; /* El body no scrollea, solo las pantallas internas */
             overscroll-behavior-y: none;
         }
 
@@ -76,7 +77,7 @@
             padding: clamp(10px, 2vh, 20px);
             flex-direction: column;
             animation: fadeScale 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            overflow-y: auto;
+            overflow-y: auto; /* Permite scroll a las pantallas en general */
             height: 100%;
         }
 
@@ -110,7 +111,6 @@
         }
 
         h1, h2, h3 { color: var(--text-main); font-weight: 800; letter-spacing: -0.02em; }
-
         .header-section { text-align: center; margin-bottom: 1.5vh; }
 
         .form-group {
@@ -159,7 +159,7 @@
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             text-align: center;
-            min-height: 46px;
+            min-height: 46px; /* Touch target size */
             touch-action: manipulation;
             user-select: none;
         }
@@ -173,6 +173,9 @@
         
         .btn-danger { background: #FFF1F2; color: var(--danger); border: 2px solid var(--danger); }
         .btn-danger:hover:not(:disabled) { background: var(--danger); color: white; transform: translateY(-1px); }
+        
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-warning:hover:not(:disabled) { box-shadow: var(--shadow-md); transform: translateY(-1px); }
 
         .btn:disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(80%); }
 
@@ -339,8 +342,9 @@
             display: none;
             flex-direction: column;
             gap: 10px;
-            overflow-y: auto;
+            overflow-y: auto !important; /* Habilitamos el scroll vertical de forma agresiva */
             height: 100%;
+            padding-bottom: 40px; /* Margen extra para scroll cómodo al final */
         }
         #screenGame.active {
             display: flex;
@@ -380,6 +384,7 @@
             flex-shrink: 0;
             position: relative;
             transition: all 0.3s ease;
+            min-height: 80px; /* Asegura que el panel crezca si el texto es largo */
         }
 
         .tutor-panel-top.success-glow {
@@ -404,7 +409,7 @@
             flex: 1;
             font-size: clamp(0.85rem, 1.8vh, 1.05rem);
             font-weight: 600;
-            line-height: 1.35;
+            line-height: 1.4;
             color: #F8FAFC;
             background: rgba(255, 255, 255, 0.12);
             padding: 10px 14px;
@@ -430,9 +435,8 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            flex: 1;
-            min-height: 0;
-            overflow-y: visible;
+            flex: 1 0 auto; 
+            /* Esto permite que crezca empujando el scroll hacia abajo */
         }
 
         .problem-display {
@@ -449,16 +453,14 @@
         }
 
         .board-container {
-            flex: 1;
             display: flex;
             flex-direction: column;
-            min-height: 0;
             background: #FFFFFF;
             border: 2px solid rgba(226, 232, 240, 0.9);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-md);
             position: relative;
-            overflow: visible;
+            overflow: hidden; /* Solo recorta lo que sale de sus propios bordes */
         }
 
         .canvas-toolbar {
@@ -474,21 +476,20 @@
 
         .canvas-toolbar .btn {
             flex: 1;
-            min-width: 100px;
-            padding: 1vh 10px;
+            min-width: 90px;
+            padding: 1vh 8px;
             min-height: 40px;
+            font-size: clamp(0.75rem, 1.6vh, 0.9rem);
         }
 
         .canvas-wrapper {
             position: relative;
             width: 100%;
-            flex: 1;
-            min-height: 180px;
-            overflow: hidden;
-            background-color: #FFFFFF;
+            min-height: 250px; /* Altura base razonable */
             display: flex;
             flex-direction: column;
             touch-action: none;
+            transition: min-height 0.3s ease; /* Transición suave al ampliar */
         }
 
         #drawCanvas { 
@@ -498,6 +499,7 @@
             cursor: crosshair; 
             touch-action: none; 
             display: block; 
+            background-color: #FFFFFF; /* Fondo blanco forzado */
             background-image: 
                 linear-gradient(rgba(226, 232, 240, 0.6) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(226, 232, 240, 0.6) 1px, transparent 1px);
@@ -565,7 +567,6 @@
             cursor: pointer;
         }
         .close-btn:hover { color: var(--danger); }
-
         .modal-content h2 { margin-bottom: 12px; color: var(--primary); font-size: 1.3rem;}
         .modal-content p { margin-bottom: 10px; font-size: 0.95rem; color: var(--text-main); line-height: 1.45; }
     </style>
@@ -573,8 +574,6 @@
 <body>
 
     <div class="app-container">
-        
-        <!-- PANTALLA 1: BIENVENIDA -->
         <div id="screenWelcome" class="screen screen-gamer-school active">
             <div class="header-section" style="margin-top: 1vh;">
                 <h1 class="gs-title">Don<br>Cálculo</h1>
@@ -609,7 +608,6 @@
             <div class="gs-footer-text">Hecho con ❤️ para aprender matemáticas</div>
         </div>
 
-        <!-- PANTALLA 2: SELECCIÓN DE OPERACIÓN -->
         <div id="screenOperation" class="screen screen-gamer-school">
             <div class="header-section">
                 <h1 id="greetingTitle" class="gs-title">Hola, estudiante</h1>
@@ -639,7 +637,6 @@
             </div>
         </div>
 
-        <!-- PANTALLA 3: SELECCIÓN DE NIVEL -->
         <div id="screenLevel" class="screen screen-gamer-school">
             <div class="header-section">
                 <h1 class="gs-title">Nivel de Desafío</h1>
@@ -669,7 +666,6 @@
             </div>
         </div>
 
-        <!-- PANTALLA 4: ÁREA PRINCIPAL DE JUEGO -->
         <div id="screenGame" class="screen">
             <div class="status-bar">
                 <div class="status-bar-info">
@@ -715,13 +711,14 @@
             <div class="game-main-area">
                 <div class="board-container">
                     <div class="canvas-toolbar">
-                        <button class="btn" style="background:#CBD5E1; color:#1E293B; border: 2px solid #64748B;" id="btnPencil" onclick="selectTool('pencil')">✏️ LÁPIZ</button>
-                        <button class="btn" style="background:#F1F5F9; color:#1E293B; border: 2px solid #E2E8F0;" id="btnEraser" onclick="selectTool('eraser')">🧽 GOMA</button>
+                        <!-- Herramientas separadas de Lápiz y Goma -->
+                        <button class="btn" id="btnPencil" onclick="selectTool('pencil')">✏️ Lápiz</button>
+                        <button class="btn" id="btnEraser" onclick="selectTool('eraser')">🧽 Goma</button>
                         <button class="btn btn-danger" id="btnClear" onclick="clearCanvas()">🗑️ Limpiar</button>
                         <button class="btn btn-primary" style="background: #3B82F6;" id="btnExpand" onclick="expandCanvas()">⬇️ Ampliar</button>
                         
                         <button class="btn btn-success" id="btnCheck" style="flex: 2;" onclick="verifyAnswer()">✓ Comprobar</button>
-                        <button class="btn btn-warning" id="btnTryAgain" style="display:none; flex: 2; background:var(--warning); color:white;" onclick="tryAgain()">🔄 Corregir en pizarra</button>
+                        <button class="btn btn-warning" id="btnTryAgain" style="display:none; flex: 2;" onclick="tryAgain()">🔄 Corregir en pizarra</button>
                         <button class="btn btn-primary" id="btnNext" style="display:none; flex: 2;" onclick="loadNextProblem()">➡️ Siguiente ejercicio</button>
                     </div>
 
@@ -735,7 +732,6 @@
             </div>
         </div>
 
-        <!-- PANTALLA 5: FIN DE SESIÓN -->
         <div id="screenEnd" class="screen">
             <div class="header-section" style="margin: auto; text-align: center;">
                 <div style="font-size: 4rem; margin-bottom: 12px;">🎉</div>
@@ -748,7 +744,6 @@
             </div>
         </div>
 
-        <!-- MODAL DE INSTRUCCIONES -->
         <div id="modalInstructions" class="modal-overlay">
             <div class="modal-content">
                 <h2>📖 Instrucciones de la Academia</h2>
@@ -760,13 +755,12 @@
             </div>
         </div>
 
-        <!-- MODAL BIENVENIDA A PIZARRA -->
         <div id="modalGameInfo" class="modal-overlay">
             <div class="modal-content">
                 <button class="close-btn" onclick="closeGameInfo()">×</button>
                 <h2>¡Bienvenido a la Pizarra! ✏️</h2>
                 <p>Usa tu dedo o ratón para resolver la cuenta en la gran pizarra blanca.</p>
-                <p><strong>Don Cálculo</strong> está justo arriba observando atentamente para darte ánimos y consejos.</p>
+                <p><strong>Don Cálculo</strong> está justo arriba observando atentamente. Si la cuenta es larga, pulsa <strong>⬇️ Ampliar</strong> o desliza hacia abajo.</p>
                 <button class="btn btn-success" style="width: 100%; margin-top: 16px;" onclick="closeGameInfo()">¡A calcular!</button>
             </div>
         </div>
@@ -879,9 +873,7 @@
             }
         }
 
-        function closeGameInfo() {
-            document.getElementById('modalGameInfo').classList.remove('active');
-        }
+        function closeGameInfo() { document.getElementById('modalGameInfo').classList.remove('active'); }
 
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -909,25 +901,37 @@
 
             document.getElementById('displayProblem').innerText = `${state.currentProblem.n1} ${state.currentProblem.sym} ${state.currentProblem.n2} = ?`;
             
+            // Restablecer el tamaño de la pizarra
+            const wrapper = document.getElementById('canvasWrapper');
+            if (wrapper) wrapper.style.minHeight = '250px'; 
+            
             clearCanvas(); 
             selectTool('pencil');
             
             const tutorPanel = document.getElementById('tutorPanelTop');
             tutorPanel.className = 'tutor-panel-top';
 
+            // Mostrar herramientas
             document.getElementById('btnPencil').style.display = 'inline-flex';
             document.getElementById('btnEraser').style.display = 'inline-flex';
             document.getElementById('btnClear').style.display = 'inline-flex';
-            document.getElementById('btnCheck').style.display = 'inline-flex';
-            document.getElementById('btnCheck').disabled = false;
-            document.getElementById('btnClear').disabled = false;
+            document.getElementById('btnExpand').style.display = 'inline-flex';
+            
             document.getElementById('btnPencil').disabled = false;
             document.getElementById('btnEraser').disabled = false;
-            document.getElementById('btnExpand').style.display = 'inline-flex';
+            document.getElementById('btnClear').disabled = false;
+            document.getElementById('btnExpand').disabled = false;
+            
+            document.getElementById('btnCheck').style.display = 'inline-flex';
+            document.getElementById('btnCheck').disabled = false;
+            
             document.getElementById('btnNext').style.display = 'none';
             document.getElementById('btnTryAgain').style.display = 'none';
             
             setTutorMessage(`¡Adelante ${state.name}! Escribe y resuelve en la pizarra. Cuando lo tengas, pulsa <strong>Comprobar</strong>.`);
+            
+            // Aseguramos el scroll arriba
+            setTimeout(() => { document.getElementById('screenGame').scrollTo({ top: 0, behavior: 'smooth' }); }, 50);
         }
 
         function calculateAnswer(n1, n2, op) {
@@ -978,7 +982,7 @@
                 e.preventDefault(); 
                 const currentY = e.touches ? e.touches[0].clientY : e.clientY;
                 const diff = currentY - startY;
-                wrapper.style.height = `${Math.max(150, startHeight + diff)}px`;
+                wrapper.style.minHeight = `${Math.max(200, startHeight + diff)}px`;
             }
 
             function stopResize() {
@@ -998,11 +1002,16 @@
             const wrapper = document.getElementById('canvasWrapper');
             const currentHeight = wrapper.offsetHeight;
             
-            wrapper.style.height = `${currentHeight + 300}px`;
+            // Aumentar la altura en un 50% de la actual
+            const newHeight = Math.floor(currentHeight * 1.5);
+            wrapper.style.minHeight = `${newHeight}px`;
             
+            // Forzar resize para que la tinta no se borre al estirar y hacer scroll
             setTimeout(() => {
-                document.getElementById('screenGame').scrollTo({
-                    top: document.getElementById('screenGame').scrollHeight,
+                resizeCanvas();
+                const screen = document.getElementById('screenGame');
+                screen.scrollTo({
+                    top: screen.scrollHeight, // Baja hasta el fondo
                     behavior: 'smooth'
                 });
             }, 100);
@@ -1054,7 +1063,10 @@
             canvas.width = newWidth; 
             canvas.height = newHeight;
             
-            if (ctx) { 
+            // Garantizar fondo blanco siempre
+            if(ctx) {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.lineCap = 'round'; 
                 ctx.lineJoin = 'round'; 
             }
@@ -1095,7 +1107,6 @@
             if (!isStart) e.preventDefault(); 
             const pos = getCoordinates(document.getElementById('drawCanvas'), e);
             ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
-            // Aumentamos el grosor del lápiz de 4 a 8 para que la IA lo vea mejor
             ctx.lineWidth = isErasing ? 32 : 8; 
             ctx.strokeStyle = '#0F172A';
             ctx.lineTo(pos.x, pos.y); 
@@ -1108,7 +1119,8 @@
         function clearCanvas() {
             if (!ctx) return;
             const canvas = document.getElementById('drawCanvas');
-            ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             hasInk = false;
         }
 
@@ -1127,15 +1139,15 @@
                 return;
             }
 
+            // Ocultamos todas las herramientas para que el estudiante no toque nada mientras corrige
             document.getElementById('btnCheck').disabled = true; 
-            document.getElementById('btnClear').disabled = true; 
-            document.getElementById('btnPencil').disabled = true;
-            document.getElementById('btnEraser').disabled = true;
+            document.getElementById('btnPencil').style.display = 'none';
+            document.getElementById('btnEraser').style.display = 'none';
+            document.getElementById('btnClear').style.display = 'none';
+            document.getElementById('btnExpand').style.display = 'none';
             setTutorMessage("", true);
 
             const canvas = document.getElementById('drawCanvas'); 
-            
-            // OPTIMIZACIÓN 1 Y 2: Redimensionamiento dinámico y compresión JPEG ultra ligera
             const maxDimension = 512;
             const scale = Math.min(1, maxDimension / Math.max(canvas.width, canvas.height));
             
@@ -1148,20 +1160,20 @@
             tCtx.fillRect(0, 0, tmpCanvas.width, tmpCanvas.height); 
             tCtx.drawImage(canvas, 0, 0, tmpCanvas.width, tmpCanvas.height);
             
-            // Aumentamos ligeramente la calidad al 80% para asegurar legibilidad
             const base64Img = tmpCanvas.toDataURL('image/jpeg', 0.8).split(',')[1];
 
             const sysPrompt = `Eres Don Cálculo, un maestro de matemáticas amigable y entusiasta. 
             El alumno se llama ${state.name} y cursa ${state.grade}º de primaria.
             Actualmente está resolviendo un ejercicio de ${state.operation.toUpperCase()} en el NIVEL ${state.level} de dificultad.
             REGLAS:
-            - Lenguaje cariñoso, pedagógico y motivador. Usa emojis.
-            - TU MISIÓN: Analizar OBLIGATORIAMENTE los trazos de la imagen adjunta paso a paso. Fíjate en cómo ha colocado los números (alineación de unidades, decenas...) y cómo ha calculado el resultado según el método tradicional.
-            - Si es CORRECTO: Felicítalo de forma específica valorando la dificultad del Nivel ${state.level} (ej. "¡Has alineado perfectamente las decenas!" o "¡Dominas las llevadas como un campeón!").
-            - Si es INCORRECTO: Dale una explicación DETALLADA y fácil de entender sobre dónde parece estar su fallo. Dale una pista clara para que lo intente arreglar él mismo (ej. "Revisa la columna de las decenas, ¿te olvidaste de sumar la que te llevabas?" o "Cuidado, has colocado las unidades debajo de las decenas"), pero NUNCA le des el resultado final.
-            - Responde en formato JSON exacto: {"status": "CORRECTO" o "INCORRECTO", "feedback": "Mensaje súper detallado y constructivo para el alumno"}`;
+            - ES MUY IMPORTANTE que analices obligatoriamente la imagen adjunta. Contiene los números escritos a mano (trazos) de la operación resuelta.
+            - TU MISIÓN: Analiza los trazos de la imagen adjunta paso a paso. Fíjate en cómo ha colocado los números (alineación de unidades, decenas...) y cómo ha calculado el resultado según el método tradicional.
+            - Sé MUCHO más específico y detallado en tu explicación, adaptando tus palabras a un niño de ${state.grade}º de primaria que está en el nivel ${state.level}.
+            - Si es CORRECTO: Felicítalo de forma muy específica valorando la dificultad (ej. "¡Has alineado perfectamente las decenas!" o "¡Dominas las llevadas como un campeón!").
+            - Si es INCORRECTO: Dale una explicación DETALLADA y muy fácil de entender sobre dónde parece estar su fallo. Dale una pista clara para que lo intente arreglar él mismo, pero NUNCA le des el resultado final directo.
+            - Responde en formato JSON exacto: {"status": "CORRECTO" o "INCORRECTO", "feedback": "Mensaje detallado y constructivo para el alumno"}`;
 
-            const userPrompt = `Operación a resolver: ${state.currentProblem.n1} ${state.currentProblem.sym} ${state.currentProblem.n2} = ${state.currentProblem.ans}. Por favor, analiza la pizarra del alumno con detalle.`;
+            const userPrompt = `Operación a resolver: ${state.currentProblem.n1} ${state.currentProblem.sym} ${state.currentProblem.n2} = ${state.currentProblem.ans}. Por favor, analiza mi pizarra dibujada.`;
 
             try {
                 const res = await fetch('/api/evaluate', {
@@ -1174,7 +1186,6 @@
                 });
 
                 if (!res.ok) throw new Error("API_ERROR");
-
                 const data = await res.json();
                 procesarResultadoIA(data);
 
@@ -1197,10 +1208,6 @@
                 setTutorMessage(`<strong>⭐ ¡Excelente trabajo!</strong><br>${feedback}`);
                 
                 document.getElementById('btnCheck').style.display = 'none'; 
-                document.getElementById('btnClear').style.display = 'none'; 
-                document.getElementById('btnPencil').style.display = 'none';
-                document.getElementById('btnEraser').style.display = 'none';
-                document.getElementById('btnExpand').style.display = 'none';
                 document.getElementById('btnNext').style.display = 'inline-flex'; 
                 document.getElementById('btnTryAgain').style.display = 'none';
                 
@@ -1210,31 +1217,33 @@
                 setTutorMessage(`<strong>💪 ¡Un pequeño reto más!</strong><br>${feedback}`);
                 
                 document.getElementById('btnCheck').style.display = 'none'; 
-                document.getElementById('btnClear').style.display = 'none'; 
-                document.getElementById('btnPencil').style.display = 'none';
-                document.getElementById('btnEraser').style.display = 'none';
-                document.getElementById('btnExpand').style.display = 'none';
                 document.getElementById('btnNext').style.display = 'none'; 
                 document.getElementById('btnTryAgain').style.display = 'inline-flex';
             }
+            
+            // Forzar el Scroll hacia arriba para que el niño pueda leer bien el mensaje largo
+            setTimeout(() => {
+                document.getElementById('screenGame').scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }, 100);
         }
         
         function tryAgain() {
             const tutorPanel = document.getElementById('tutorPanelTop');
             tutorPanel.className = 'tutor-panel-top';
-            setTutorMessage(`¡Ánimo ${state.name}! Utiliza la goma para corregir o borra para intentarlo de nuevo.`);
+            setTutorMessage(`¡Tú puedes ${state.name}! Corrige lo que necesites en la pizarra y vuelve a comprobar.`);
             
-            document.getElementById('btnCheck').style.display = 'inline-flex'; 
-            document.getElementById('btnClear').style.display = 'inline-flex'; 
+            document.getElementById('btnTryAgain').style.display = 'none';
+            document.getElementById('btnCheck').style.display = 'inline-flex';
+            document.getElementById('btnCheck').disabled = false;
+            
+            // Volvemos a mostrar las herramientas
             document.getElementById('btnPencil').style.display = 'inline-flex';
             document.getElementById('btnEraser').style.display = 'inline-flex';
+            document.getElementById('btnClear').style.display = 'inline-flex';
             document.getElementById('btnExpand').style.display = 'inline-flex';
-            document.getElementById('btnTryAgain').style.display = 'none'; 
-            document.getElementById('btnNext').style.display = 'none';
-            document.getElementById('btnCheck').disabled = false; 
-            document.getElementById('btnClear').disabled = false; 
-            document.getElementById('btnPencil').disabled = false;
-            document.getElementById('btnEraser').disabled = false;
             
             selectTool('pencil');
         }
